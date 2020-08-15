@@ -61,19 +61,20 @@ class NewVM(Script):
     proxmox = ProxmoxAPI('192.168.11.203', user='root@pam',
         token_name='nb1', token_value='0cf6ab07-ff7e-41a3-80e4-e09e7fea6c7d', verify_ssl=False)
 
-    vm_name = StringVar(label="VM name")
-    dns_name = StringVar(label="DNS name", required=False)
-    primary_ip4 = IPAddressWithMaskVar(label="IPv4 address")
+    vm_name = StringVar(label="Name")
+    dns_name = StringVar(label="DNS Name", required=True, default="HOST.newtelco.local")
+    # dns_name = StringVar(label="DNS name", required=False)
+    primary_ip4 = IPAddressWithMaskVar(label="IPv4 address", required=False, default="192.168.11.")
     # primary_ip6 = IPAddressWithMaskVar(label="IPv6 address", required=False)
     # vrf = ObjectVar(VRF.objects, required=False)
-    role = ObjectVar(DeviceRole.objects.filter(vm_role=True), required=False, default=8)
-    status = ChoiceVar(VirtualMachineStatusChoices, default=VirtualMachineStatusChoices.STATUS_ACTIVE)
-    # cluster = ObjectVar(Cluster.objects)
+    # role = ObjectVar(DeviceRole.objects.filter(vm_role=True), required=False, default=8)
+    # status = ChoiceVar(VirtualMachineStatusChoices, default=VirtualMachineStatusChoices.STATUS_ACTIVE)
+    cluster = ObjectVar(Cluster.objects, default="4")
     # tenant = ObjectVar(Tenant.objects, required=False)
     # platform = ObjectVar(Platform.objects, required=False)
-    interface_name = StringVar(default="eth0")
+    # interface_name = StringVar(default="eth0")
     # mac_address = StringVar(label="MAC address", required=False)
-    vcpus = IntegerVar(label="VCPUs", required=True)
+    vcpus = IntegerVar(label="vCPUs", required=True)
     memory = IntegerVar(label="Memory (MB)", required=True)
     disk = IntegerVar(label="Disk (GB)", required=True)
     comments = TextVar(label="Comments", required=False)
@@ -110,18 +111,17 @@ class NewVM(Script):
 
         vm = VirtualMachine(
             name=data["vm_name"],
-            role=data["role"],
-            status=data["status"],
             vcpus=data["vcpus"],
             memory=data["memory"],
             disk=data["disk"],
             comments=data["comments"],
+            cluster=data["cluster"]
         )
         if commit:
             vm.save()
 
         interface = Interface(
-            name=data["interface_name"],
+            name="eth0",
             type=InterfaceTypeChoices.TYPE_VIRTUAL,
             virtual_machine=vm,
         )
@@ -137,14 +137,12 @@ class NewVM(Script):
                 a = IPAddress.objects.get(
                     address=addr,
                     family=addr.version,
-                    vrf=data.get("vrf"),
                 )
                 result = "Assigned"
             except ObjectDoesNotExist:
                 a = IPAddress(
                    address=addr,
                    family=addr.version,
-                   vrf=data.get("vrf"),
                 )
                 result = "Created"
             a.status = IPAddressStatusChoices.STATUS_ACTIVE
@@ -152,34 +150,43 @@ class NewVM(Script):
             if a.interface:
                 raise RuntimeError("Address %s is already assigned" % addr)
             a.interface = interface
-            a.tenant = data.get("tenant")
+            # a.tenant = data.get("tenant")
             a.save()
             self.log_info("%s IP address %s %s" % (result, a.address, a.vrf or ""))
             setattr(vm, "primary_ip%d" % a.family, a)
 
         def connect_pve(addr):
             # self.log_info(addr)
-            proxmox = ProxmoxAPI(addr, user='root@pam',
+            proxmox = ProxmoxAPI(addr, user='root@pam', password="",
                                          token_name='nb1', token_value='0cf6ab07-ff7e-41a3-80e4-e09e7fea6c7d', verify_ssl=False)
-            self.log_success(proxmox.nodes.get())
+            # self.log_success(proxmox.nodes.get())
             node = proxmox.nodes(data["pve_host"])
-            self.log_info(node.storage.local.content.get())
+            # self.log_info(node.storage.local.content.get())
             # self.log_success(node)
             # self.log_info(node.storage('local-zfs').status.get())
-            avail=format_size(node.storage('local-zfs').status.get()["avail"], "GB")
-            total=format_size(node.storage('local-zfs').status.get()["total"], "GB")
-            self.log_info(avail)
-            self.log_info(total)
+            # avail=format_size(node.storage('local-zfs').status.get()["avail"], "GB")
+            # total=format_size(node.storage('local-zfs').status.get()["total"], "GB")
+            # self.log_info(avail)
+            # self.log_info(total)
+
+            nextId = proxmox.cluster.nextid.get()
+            disk = data["disk"]
+            ipAddr = data["primary_ip4"]
+
             # CREATE VM
-            # node.openvz.create(vmid=202,
-		# ostemplate='local:vztmpl/debian-9.0-standard_20170530_amd64.tar.gz',
-		# hostname='debian-stretch',
-		# storage='local',
-		# memory=512,
-		# swap=512,
-		# cores=1,
-		# password='secret',
-		# net0='name=eth0,bridge=vmbr0,ip=192.168.22.1/20,gw=192.168.16.1')
+            if commit: 
+                node.qemu.create(vmid=nextId,
+                    cdrom="local:iso/ubuntu-20.04.1-live-server-amd64.iso",
+                    name=data["vm_name"],
+                    storage="local",
+                    memory=data["memory"],
+                    cores=data["vcpus"],
+                    net0="model=virtio,bridge=vmbr0",
+                    ostype="l26",
+                    scsi0=f"local-zfs:vm-{nextId}-disk-0:{disk}G",
+                    ipconfig0=f"gw=192.168.11.1,ip={ipAddr}",
+                    agent="enabled=1")
+                self.log_success("Created VM {0} ({1})".format(vm.name, nextId))
 
         # self.log_info(data["pve_host"])
         # self.log_info(pve_ip)
