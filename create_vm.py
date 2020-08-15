@@ -136,13 +136,11 @@ class NewVM(Script):
             try:
                 a = IPAddress.objects.get(
                     address=addr,
-                    family=addr.version,
                 )
                 result = "Assigned"
             except ObjectDoesNotExist:
                 a = IPAddress(
                    address=addr,
-                   family=addr.version,
                 )
                 result = "Created"
             a.status = IPAddressStatusChoices.STATUS_ACTIVE
@@ -170,12 +168,16 @@ class NewVM(Script):
             # self.log_info(total)
 
             nextId = proxmox.cluster.nextid.get()
-            disk = data["disk"]
-            ipAddr = data["primary_ip4"]
+            # thisVm = VirtualMachine.objects.get(
+            #     name=data["vm_name"]
+            # )
+            disk=data["disk"]
+            ipAddr=data["primary_ip4"]
 
             # CREATE VM
             if commit: 
-                node.qemu.create(vmid=nextId,
+                node.qemu.create(
+                    vmid=nextId,
                     cdrom="local:iso/ubuntu-20.04.1-live-server-amd64.iso",
                     name=data["vm_name"],
                     storage="local",
@@ -183,9 +185,19 @@ class NewVM(Script):
                     cores=data["vcpus"],
                     net0="model=virtio,bridge=vmbr0",
                     ostype="l26",
-                    scsi0=f"local-zfs:vm-{nextId}-disk-0:{disk}G",
+                    scsihw="virtio-scsi-pci",
+                    scsi0=f"local-zfs:vm-{nextId}-disk-0,size={disk}G",
                     ipconfig0=f"gw=192.168.11.1,ip={ipAddr}",
                     agent="enabled=1")
+
+                localStorage = node.storage('local-zfs')
+                localStorage.content.create(
+                    filename=f"vm-{nextId}-disk-0",
+                    size=f"{disk}G",
+                    vmid=f"{nextId}",
+                    format="raw"
+                )
+
                 self.log_success("Created VM {0} ({1})".format(vm.name, nextId))
 
         # self.log_info(data["pve_host"])
