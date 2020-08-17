@@ -1,32 +1,32 @@
 {
-	"name": "netpalm_importer",
-	"version": "0.0.1",
-	"description": "Netpalm to Netbox Import Helper",
-	"main": "index.js",
-	"author": "ndom91 <yo@ndo.dev>",
-	"scripts": {
-		"retrieve": "node index.js retrieve",
-		"task": "node index.js task"
-	},
-	"keywords": [
-		"netpalm",
-		"netbox",
-		"import",
-		"cisco",
-		"juniper",
-		"networktocode"
-	],
-	"license": "MIT",
-	"dependencies": {
-		"csv-writer": "^1.6.0",
-		"isomorphic-unfetch": "^3.0.0"
-	},
-	"devDependencies": {
-		"prettier": "^2.0.5"
-	},
-	"prettier": {
-		"semi": false,
-		"trailingComma": "es5",
-		"arrowParens": "avoid"
-	}
+  "name": "netpalm_importer",
+  "version": "0.0.1",
+  "description": "Netpalm to Netbox Import Helper",
+  "main": "index.js",
+  "author": "ndom91 <yo@ndo.dev>",
+  "scripts": {
+    "retrieve": "node index.js retrieve",
+    "task": "node index.js task"
+  },
+  "keywords": [
+    "netpalm",
+    "netbox",
+    "import",
+    "cisco",
+    "juniper",
+    "networktocode"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "csv-writer": "^1.6.0",
+    "isomorphic-unfetch": "^3.0.0"
+  },
+  "devDependencies": {
+    "prettier": "^2.0.5"
+  },
+  "prettier": {
+    "semi": false,
+    "trailingComma": "es5",
+    "arrowParens": "avoid"
+  }
 }

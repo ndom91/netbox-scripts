@@ -19,9 +19,9 @@ You can copy the contents of this into the import field on your Netbox instance 
 ### 🚧 To Do
 
 - Definitely need to make much more of this dynamic.
-	- i.e. Ability to define API Key, Username, Password, etc. in `.env` file for example
-	- Define output format
-	- Define output fields which will be the same for all interfaces, i.e. `device`
+  - i.e. Ability to define API Key, Username, Password, etc. in `.env` file for example
+  - Define output format
+  - Define output fields which will be the same for all interfaces, i.e. `device`
 
 ### 👏 Contributing
 
