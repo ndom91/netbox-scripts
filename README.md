@@ -16,10 +16,14 @@ When opening in Netbox, you will have the ability to define the following fields
 - Cluster
 - Notes
 
-After making sure 'Commit' is checked and submitting the form, Netbox will add the VM documentation and this script will talk to your Proxmox cluster via the [proxmoxer](https://pypi.org/project/proxmoxer/) Python library to create the VM as defined by you as well as the disk on `local-zfs` of your chosen Proxmox host. 
+After making sure 'Commit' is checked and submitting the form, Netbox will add the VM documentation and this script will talk to your Proxmox cluster via the [`proxmoxer`](https://pypi.org/project/proxmoxer/) Python library to create the VM as well as the disk definition on the `local-zfs` store of your chosen Proxmox host. 
 
 - [Proxmox API Docs](https://pve.proxmox.com/pve-docs/api-viewer/index.html)
 - [Netbox Template](https://github.com/netbox-community/reports/blob/master/scripts/create_vm.py)
+
+#### 2. Netpalm Service Template
+
+Primary goal of this is to generate a list of interfaces in a format Netbox can understand for importing.
 
 ### License
 
