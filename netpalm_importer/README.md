@@ -1,10 +1,10 @@
-# Netpalm -> Netbox Importer
+# 🌴 Netpalm -> Netbox Importer
 
 Quick and dirty node script with a lot hardcoded still at the moment.
 
 However, it works to grab interfaces off your devices and spits out a csv ready to import into netbox.
 
-### Getting Started
+### 🚀 Getting Started
 
 1. Customize your netpalm `netmiko_retrieve_data` service call arguments.
 2. Run `node index.js retrieve`
@@ -14,17 +14,19 @@ However, it works to grab interfaces off your devices and spits out a csv ready 
 
 You will then have an interfaces.csv file in your project root with the results based upon the format in the `getTask` function
 
-### To Do
+You can copy the contents of this into the import field on your Netbox instance at https://netbox.company.com/dcim/interfaces/import/
+
+### 🚧 To Do
 
 - Definitely need to make much more of this dynamic.
 	- i.e. Ability to define API Key, Username, Password, etc. in `.env` file for example
 	- Define output format
 	- Define output fields which will be the same for all interfaces, i.e. `device`
 
-### Contributing
+### 👏 Contributing
 
 Feel free to open a PR
 
-#### License
+#### 📝 License
 
 MIT
