@@ -38,9 +38,17 @@ or
       {
         "operation": "retrieve",
         "payload": {
-          {#
-          insert the payload of a getconfig API CALL
-          #}
+					"library": "netmiko",
+					"connection_args": {
+						"device_type": "cisco_ios",
+						"host": "{{host}}",
+						"username": "{{username}}",
+						"password": "{{password}}",
+					},
+					"command": "show ip int brief",
+					"args":{
+						"use_textfsm": true
+					}
         }
       },
       {
