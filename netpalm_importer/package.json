@@ -1,0 +1,25 @@
+{
+  "name": "netbox_grab_interfaces",
+  "version": "1.0.0",
+  "description": "",
+  "main": "netbox_grab_interfaces.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "csv-writer": "^1.6.0",
+    "isomorphic-unfetch": "^3.0.0"
+  },
+  "devDependencies": {
+    "prettier": "^2.0.5"
+  },
+  "prettier": {
+    "semi": false,
+    "trailingComma": "es5",
+    "arrowParens": "avoid"
+  }
+}
