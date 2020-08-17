@@ -105,7 +105,7 @@ const getTask = async taskId => {
     })
     csvWriter
       .writeRecords(outInterfaces)
-      .then(() => console.log("Interfaces written!"))
+      .then(() => console.log("Interfaces dumped!"))
   }
 }
 
